@@ -235,18 +235,18 @@ export default function DrawingGame({
   return (
     <div className={`w-full max-w-2xl mx-auto ${className}`}>
       <motion.div
-        className="relative backdrop-blur-strong bg-gradient-to-br from-white/20 to-white/5 rounded-3xl shadow-glass border border-white/20 p-8 overflow-hidden"
+        className="relative backdrop-blur bg-zinc-900/70 rounded-3xl border border-zinc-700 p-8 overflow-hidden supports-[backdrop-filter]:bg-zinc-900/60"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Decorative background elements */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-400/20 to-purple-600/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-tr from-pink-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
+        {/* Subtle decorative elements */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-zinc-700/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-zinc-600/10 rounded-full blur-3xl"></div>
         
         {/* Security badge */}
         <motion.div 
-          className="absolute top-5 right-5 backdrop-blur-md bg-gradient-to-r from-purple-500/80 to-pink-500/80 text-white px-4 py-2 rounded-full text-xs font-bold shadow-button-3d border border-white/20"
+          className="absolute top-5 right-5 backdrop-blur-md bg-zinc-800/80 text-zinc-50 px-4 py-2 rounded-full text-xs font-bold border border-zinc-700/50"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -256,26 +256,26 @@ export default function DrawingGame({
         {/* Logo */}
         <div className="relative flex items-center justify-center gap-3 mb-2 z-10">
           <motion.div 
-            className="w-12 h-12 bg-gradient-to-br from-purple-500/80 to-pink-600/80 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl shadow-button-3d border border-white/20"
+            className="w-12 h-12 bg-zinc-800/80 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl border border-zinc-700/50"
             whileHover={{ scale: 1.1, rotate: 5 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             🎨
           </motion.div>
-          <h1 className="text-3xl font-extrabold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-extrabold text-zinc-50">
             Creative CAPTCHA
           </h1>
         </div>
 
-        <p className="text-white/80 text-lg font-semibold mb-8 text-center relative z-10">
+        <p className="text-zinc-400 text-lg font-semibold mb-8 text-center relative z-10">
           Prove you&apos;re human by drawing!
         </p>
 
         {/* Drawing Challenge Section */}
-        <div className="relative backdrop-blur-md bg-gradient-to-br from-white/15 to-white/5 rounded-3xl p-6 mb-6 border border-white/20 shadow-glass z-10">
+        <div className="relative backdrop-blur-md bg-zinc-800/30 rounded-3xl p-6 mb-6 border border-zinc-700/20 z-10">
           <div className="text-center mb-6">
             <motion.div
-              className="text-2xl font-extrabold text-white mb-2 flex items-center justify-center gap-2"
+              className="text-2xl font-extrabold text-zinc-50 mb-2 flex items-center justify-center gap-2"
               animate={gameState === 'prompt' ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
             >
@@ -283,7 +283,7 @@ export default function DrawingGame({
               Creative Challenge
             </motion.div>
             <motion.div 
-              className="text-xl text-white/90 font-semibold"
+              className="text-xl text-zinc-300 font-semibold"
               key={prompt} // Re-animate when prompt changes
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -294,7 +294,7 @@ export default function DrawingGame({
           </div>
 
           {/* Drawing Area */}
-          <div className="backdrop-blur-sm bg-white/90 rounded-2xl p-4 shadow-glass border border-white/30 mb-4">
+          <div className="backdrop-blur-sm bg-zinc-50/95 rounded-2xl p-4 border border-zinc-300/50 mb-4">
             <DrawingCanvas
               ref={canvasRef}
               width={500}
@@ -322,7 +322,7 @@ export default function DrawingGame({
 
           {/* Instructions */}
           <motion.div 
-            className="mt-4 text-center text-sm text-white/80"
+            className="mt-4 text-center text-sm text-zinc-400"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -365,7 +365,7 @@ export default function DrawingGame({
           {gameState === 'generated' && (
             <motion.button
               onClick={handleContinueToVerification}
-              className="w-full py-4 px-8 backdrop-blur-md bg-gradient-to-br from-blue-500/80 to-indigo-500/80 hover:from-blue-400/90 hover:to-indigo-400/90 text-white font-bold text-lg rounded-2xl transition-all duration-300 border border-white/20 shadow-button-3d hover:shadow-glass-hover"
+              className="w-full py-4 px-8 backdrop-blur-md bg-zinc-50 hover:bg-zinc-200 text-zinc-900 font-bold text-lg rounded-2xl transition-all duration-300 border border-zinc-300/50"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
@@ -379,7 +379,7 @@ export default function DrawingGame({
           {gameState === 'completed' && (
             <motion.button
               onClick={handleReset}
-              className="w-full py-4 px-8 backdrop-blur-md bg-gradient-to-br from-purple-500/80 to-pink-500/80 hover:from-purple-400/90 hover:to-pink-400/90 text-white font-bold text-lg rounded-2xl transition-all duration-300 border border-white/20 shadow-button-3d hover:shadow-glass-hover"
+              className="w-full py-4 px-8 backdrop-blur-md bg-zinc-50 hover:bg-zinc-200 text-zinc-900 font-bold text-lg rounded-2xl transition-all duration-300 border border-zinc-300/50"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 1 }}
@@ -394,15 +394,15 @@ export default function DrawingGame({
         {/* Creative Encouragement */}
         {gameState === 'drawing' && (
           <motion.div
-            className="relative mt-6 text-center p-4 backdrop-blur-md bg-gradient-to-r from-white/10 to-white/5 rounded-2xl border border-white/20 shadow-glass z-10"
+            className="relative mt-6 text-center p-4 backdrop-blur-md bg-zinc-800/30 rounded-2xl border border-zinc-700/50 z-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            <div className="text-white/90 font-semibold text-sm">
+            <div className="text-zinc-300 font-semibold text-sm">
               🌟 Let your creativity flow! There&apos;s no wrong way to draw.
             </div>
-            <div className="text-white/70 text-xs mt-1">
+            <div className="text-zinc-400 text-xs mt-1">
               Your unique artistic expression helps verify you&apos;re human
             </div>
           </motion.div>

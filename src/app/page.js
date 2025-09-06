@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import DrawingGame from '@/components/games/DrawingGame';
+import LoginCardSection from '@/components/ui/login-signup';
 
 export default function Home() {
   const [verificationResult, setVerificationResult] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleVerified = (result) => {
     setVerificationResult(result);
@@ -19,6 +21,10 @@ export default function Home() {
 
   const handleGameComplete = (analytics) => {
     console.log('Game completed with analytics:', analytics);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
   };
 
   if (showSuccess) {
@@ -38,7 +44,7 @@ export default function Home() {
             </p>
           </div>
           <button 
-            onClick={() => {setShowSuccess(false); setVerificationResult(null);}}
+            onClick={() => {setShowSuccess(false); setVerificationResult(null); setIsLoggedIn(false);}}
             className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors"
           >
             Try Again
@@ -48,14 +54,21 @@ export default function Home() {
     );
   }
 
+  // Show drawing CAPTCHA directly
   return (
-    <div className="min-h-screen bg-purple-pink bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-40 right-10 w-64 h-64 bg-indigo-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Dark theme background with subtle patterns */}
+      <div className="absolute inset-0 pointer-events-none [background:radial-gradient(80%_60%_at_50%_30%,rgba(255,255,255,0.03),transparent_60%)]" />
+      
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none" 
+           style={{
+             backgroundImage: `
+               linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+               linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+             `,
+             backgroundSize: '40px 40px'
+           }}>
       </div>
       
       <DrawingGame 

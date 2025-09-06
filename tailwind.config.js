@@ -8,12 +8,43 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        border: "rgb(var(--border))",
+        input: "rgb(var(--input))",
+        ring: "rgb(var(--ring))",
+        background: "rgb(var(--background))",
+        foreground: "rgb(var(--foreground))",
         primary: {
+          DEFAULT: "rgb(var(--primary))",
+          foreground: "rgb(var(--primary-foreground))",
           50: '#f0f9ff',
           500: '#3b82f6',
           600: '#2563eb',
           700: '#1d4ed8',
           900: '#1e3a8a',
+        },
+        secondary: {
+          DEFAULT: "rgb(var(--secondary))",
+          foreground: "rgb(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "rgb(var(--destructive))",
+          foreground: "rgb(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "rgb(var(--muted))",
+          foreground: "rgb(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "rgb(var(--accent))",
+          foreground: "rgb(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "rgb(var(--popover))",
+          foreground: "rgb(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "rgb(var(--card))",
+          foreground: "rgb(var(--card-foreground))",
         },
         game: {
           bg: '#000000',
