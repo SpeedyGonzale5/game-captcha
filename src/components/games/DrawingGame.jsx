@@ -11,6 +11,7 @@ import { calculateDrawingHumanScore } from '@/lib/drawingAnalytics';
 import { generateSessionId } from '@/lib/securityAnalytics';
 import { cn } from '@/lib/utils';
 import { ShineBorder } from "@/components/magicui/shine-border";
+import { Component as Loader1 } from "@/components/loader-1";
 
 export default function DrawingGame({
   onVerified,
@@ -291,6 +292,7 @@ export default function DrawingGame({
               onDrawingUpdate={handleDrawingUpdate}
               onDrawingComplete={handleDrawingComplete}
               className="mx-auto relative rounded-lg"
+              placeholderComponent={gameState === 'prompt' ? <Loader1 /> : null}
             />
           </div>
           

@@ -11,6 +11,7 @@ const DrawingCanvas = forwardRef(({
   onDrawingComplete,
   brushSize = 3,
   brushColor = '#000000',
+  placeholderComponent = null,
   className = ""
 }, ref) => {
   const canvasRef = useRef(null);
@@ -267,11 +268,9 @@ const DrawingCanvas = forwardRef(({
       />
       
       {!hasDrawn && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-gray-400 text-center">
-            <div className="text-2xl mb-2">✏️</div>
-            <div className="text-sm">Start drawing here</div>
-          </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          {placeholderComponent || <div className="text-2xl mb-2">✏️</div>}
+          <div className="text-gray-400 text-sm mt-2">Start drawing here</div>
         </div>
       )}
     </motion.div>
