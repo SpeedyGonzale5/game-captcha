@@ -81,6 +81,11 @@ module.exports = {
           '50%': { transform: 'scale(1.05)', opacity: '0.8' },
           '70%': { transform: 'scale(0.9)', opacity: '1' },
           '100%': { transform: 'scale(1)', opacity: '1' }
+        },
+        shine: {
+          '0%': { backgroundPosition: '0% 0%' },
+          '50%': { backgroundPosition: '100% 100%' },
+          '100%': { backgroundPosition: '0% 0%' },
         }
       },
       backgroundImage: {

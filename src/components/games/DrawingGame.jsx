@@ -10,6 +10,7 @@ import { generateRandomPrompt, processDrawingWithAI, validateDrawingContent } fr
 import { calculateDrawingHumanScore } from '@/lib/drawingAnalytics';
 import { generateSessionId } from '@/lib/securityAnalytics';
 import { cn } from '@/lib/utils';
+import { ShineBorder } from "@/components/magicui/shine-border";
 
 export default function DrawingGame({
   onVerified,
@@ -234,9 +235,15 @@ export default function DrawingGame({
   }, []);
 
   return (
-    <div className={`w-full max-w-2xl mx-auto ${className}`}>
+    <div className={`w-full max-w-2xl mx-auto relative ${className}`}>
+      <ShineBorder
+        className="absolute inset-0 rounded-3xl z-0"
+        shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+        borderWidth={2}
+        duration={14}
+      />
       <motion.div
-        className="relative bg-white/40 rounded-3xl border border-white/50 p-8 overflow-hidden backdrop-blur-lg shadow-glass-light"
+        className="relative z-10 w-full h-full p-8 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl flex flex-col items-center justify-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -247,7 +254,7 @@ export default function DrawingGame({
         
         {/* Security badge */}
         <motion.div 
-          className="absolute top-5 right-5 bg-black/60 text-white px-4 py-2 rounded-full text-xs font-bold border border-gray-700 backdrop-blur-md shadow-sm"
+          className="absolute top-6 right-6 bg-black text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -273,7 +280,7 @@ export default function DrawingGame({
         </p>
 
         {/* Drawing Challenge Section */}
-        <div className="relative bg-white/50 rounded-3xl p-6 mb-6 border border-white/70 z-10 backdrop-blur-md shadow-inner-glass">
+        <div className="relative bg-white/80 rounded-2xl p-6 mb-6 border border-gray-200 z-10 shadow-lg">
           <div className="text-center mb-6">
             <motion.div
               className="text-2xl font-extrabold text-black mb-2 flex items-center justify-center gap-2"
@@ -294,7 +301,7 @@ export default function DrawingGame({
           </div>
 
           {/* Drawing Area */}
-          <div className="bg-white/70 rounded-2xl p-4 border border-white/80 mb-4 shadow-inner-lg">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4 shadow-sm">
             <DrawingCanvas
               ref={canvasRef}
               width={500}
@@ -361,23 +368,23 @@ export default function DrawingGame({
             isVerifying={isProcessing}
             disabled={!hasDrawing || isProcessing || gameState === 'generated' || gameState === 'completed'}
             className={cn(
-              "w-full py-4 px-8 bg-black text-white font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md transform hover:-translate-y-1 active:translate-y-0.5",
+              "w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90",
               (gameState === 'generated' || gameState === 'completed') ? 'hidden' : '',
               (!hasDrawing || isProcessing) && "opacity-50 cursor-not-allowed"
             )}
           >
-            <span className="relative top-px">SUBMIT DRAWING</span>
+            <span className="relative">SUBMIT DRAWING</span>
           </VerifyButton>
 
           {gameState === 'generated' && (
             <motion.button
               onClick={handleContinueToVerification}
-              className="w-full py-4 px-8 bg-black text-white font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md transform hover:-translate-y-1 active:translate-y-0.5"
+              className="w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02, y: -3 }}
-              whileTap={{ scale: 0.98, y: 0 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               Continue to Verification
             </motion.button>
@@ -386,12 +393,12 @@ export default function DrawingGame({
           {gameState === 'completed' && (
             <motion.button
               onClick={handleReset}
-              className="w-full py-4 px-8 bg-black text-white font-extrabold text-lg rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md transform hover:-translate-y-1 active:translate-y-0.5"
+              className="w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 1 }}
-              whileHover={{ scale: 1.02, y: -3 }}
-              whileTap={{ scale: 0.98, y: 0 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               Create Another Masterpiece
             </motion.button>
@@ -401,7 +408,7 @@ export default function DrawingGame({
         {/* Creative Encouragement */}
         {gameState === 'drawing' && (
           <motion.div
-            className="relative mt-6 text-center p-4 bg-white/50 rounded-2xl border border-white/70 z-10 backdrop-blur-md shadow-inner-glass"
+            className="relative mt-6 text-center p-4 bg-white/90 rounded-xl border border-gray-200 z-10 shadow-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
@@ -409,7 +416,7 @@ export default function DrawingGame({
             <div className="text-black font-bold text-sm">
               Let your creativity flow! There&apos;s no wrong way to draw.
             </div>
-            <div className="text-gray-700 text-xs mt-1">
+            <div className="text-gray-600 text-xs mt-1">
               Your unique artistic expression helps verify you&apos;re human
             </div>
           </motion.div>
