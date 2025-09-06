@@ -101,6 +101,8 @@ module.exports = {
         'button-pressed': '0 2px 8px 0 rgba(31, 38, 135, 0.4)',
         'neon-green': '0 0 5px #00ff00',
         'neon-yellow': '0 0 8px #ffff00',
+        'glass-light': '0 10px 30px rgba(0, 0, 0, 0.2)',
+        'inner-glass': 'inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2)',
       },
       dropShadow: {
         'neon-green': '0 0 5px #00ff00',
@@ -109,6 +111,10 @@ module.exports = {
       backdropBlur: {
         'glass': '10px',
         'strong': '20px',
+        'sm': '4px',
+        'md': '12px',
+        'lg': '16px',
+        'xl': '24px',
       },
       borderRadius: {
         'glass': '16px',

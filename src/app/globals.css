@@ -82,6 +82,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /* Glass morphism slider styles */
@@ -90,26 +91,26 @@ body {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: #4b5563; /* Dark grey for slider thumb */
+  border: 2px solid rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
 }
 
 .slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: #4b5563; /* Dark grey for slider thumb */
+  border: 2px solid rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Custom scrollbar for glass morphism */
@@ -118,18 +119,25 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1); /* Light black, semi-transparent for track */
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: rgba(0, 0, 0, 0.3); /* Dark black, semi-transparent for thumb */
   border-radius: 4px;
   backdrop-filter: blur(10px);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #5a67d8, #6b46c1);
+  background: rgba(0, 0, 0, 0.5); /* Darker black on hover */
+}
+
+/* Set a default focus outline to a subtle grey */
+*:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.3) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
 }
 
 @theme inline {
