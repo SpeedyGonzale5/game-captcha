@@ -8,14 +8,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        border: "rgb(var(--border))",
-        input: "rgb(var(--input))",
-        ring: "rgb(var(--ring))",
-        background: "rgb(var(--background))",
-        foreground: "rgb(var(--foreground))",
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
+        background: "var(--background)",
+        foreground: "var(--foreground)",
         primary: {
-          DEFAULT: "rgb(var(--primary))",
-          foreground: "rgb(var(--primary-foreground))",
+          DEFAULT: "var(--primary)",
+          foreground: "var(--primary-foreground)",
           50: '#f0f9ff',
           500: '#3b82f6',
           600: '#2563eb',
@@ -23,28 +23,28 @@ module.exports = {
           900: '#1e3a8a',
         },
         secondary: {
-          DEFAULT: "rgb(var(--secondary))",
-          foreground: "rgb(var(--secondary-foreground))",
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--secondary-foreground)",
         },
         destructive: {
-          DEFAULT: "rgb(var(--destructive))",
-          foreground: "rgb(var(--destructive-foreground))",
+          DEFAULT: "var(--destructive)",
+          foreground: "var(--destructive-foreground)",
         },
         muted: {
-          DEFAULT: "rgb(var(--muted))",
-          foreground: "rgb(var(--muted-foreground))",
+          DEFAULT: "var(--muted)",
+          foreground: "var(--muted-foreground)",
         },
         accent: {
-          DEFAULT: "rgb(var(--accent))",
-          foreground: "rgb(var(--accent-foreground))",
+          DEFAULT: "var(--accent)",
+          foreground: "var(--accent-foreground)",
         },
         popover: {
-          DEFAULT: "rgb(var(--popover))",
-          foreground: "rgb(var(--popover-foreground))",
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)",
         },
         card: {
-          DEFAULT: "rgb(var(--card))",
-          foreground: "rgb(var(--card-foreground))",
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
         },
         game: {
           bg: '#000000',
@@ -116,5 +116,5 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 }

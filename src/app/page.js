@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import DrawingGame from '@/components/games/DrawingGame';
 import LoginCardSection from '@/components/ui/login-signup';
+import { Component as AnimatedBackground } from "@/components/ui/raycast-red-blue-animated-background";
 
 export default function Home() {
   const [verificationResult, setVerificationResult] = useState(null);
@@ -56,25 +57,18 @@ export default function Home() {
 
   // Show drawing CAPTCHA directly
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Dark theme background with subtle patterns */}
-      <div className="absolute inset-0 pointer-events-none [background:radial-gradient(80%_60%_at_50%_30%,rgba(255,255,255,0.03),transparent_60%)]" />
-      
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-20 pointer-events-none" 
-           style={{
-             backgroundImage: `
-               linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-               linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
-             `,
-             backgroundSize: '40px 40px'
-           }}>
+    <div className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0">
+        <AnimatedBackground />
       </div>
       
-      <DrawingGame 
-        onVerified={handleVerified}
-        onGameComplete={handleGameComplete}
-      />
+      <div className="relative z-10">
+        <DrawingGame 
+          onVerified={handleVerified}
+          onGameComplete={handleGameComplete}
+        />
+      </div>
     </div>
   );
 }
