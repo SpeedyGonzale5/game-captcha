@@ -15,7 +15,7 @@ export default function DrawingGame({
   onGameComplete,
   className = ""
 }) {
-  const [gameState, setGameState] = useState('prompt'); // prompt, drawing, processing, completed
+  const [gameState, setGameState] = useState('prompt'); // prompt, drawing, processing, generated, completed
   const [prompt, setPrompt] = useState('');
   const [brushSize, setBrushSize] = useState(3);
   const [brushColor, setBrushColor] = useState('#000000');
@@ -105,13 +105,22 @@ export default function DrawingGame({
     if (canvasRef.current && canvasRef.current.undo) {
       canvasRef.current.undo();
     }
-    setDrawingAnalytics(prev => ({
-      ...prev,
-      interactions: [...prev.interactions, {
-        type: 'undo',
-        timestamp: Date.now()
-      }]
-    }));
+    
+    // Update analytics and check if we still have strokes
+    setDrawingAnalytics(prev => {
+      const updatedStrokes = prev.strokes.slice(0, -1);
+      // Update hasDrawing based on remaining strokes
+      setHasDrawing(updatedStrokes.length > 0);
+      
+      return {
+        ...prev,
+        strokes: updatedStrokes,
+        interactions: [...prev.interactions, {
+          type: 'undo',
+          timestamp: Date.now()
+        }]
+      };
+    });
   }, []);
 
   // Submit drawing for AI processing
@@ -161,23 +170,8 @@ export default function DrawingGame({
         });
       }
 
-      setGameState('completed');
+      setGameState('generated');
       setIsProcessing(false);
-
-      // Trigger verification
-      if (onVerified) {
-        setTimeout(() => {
-          onVerified({
-            isHuman: securityAnalysis.isHuman,
-            score: securityAnalysis.totalScore,
-            sessionId: sessionId.current,
-            type: 'drawing',
-            prompt: prompt,
-            artwork: aiProcessingResult.artwork,
-            analytics: drawingAnalytics
-          });
-        }, 3000); // Show artwork for 3 seconds before verification
-      }
 
     } catch (error) {
       console.error('Drawing processing error:', error);
@@ -186,6 +180,34 @@ export default function DrawingGame({
       setGameState('drawing');
     }
   }, [hasDrawing, prompt, drawingAnalytics, onGameComplete, onVerified]);
+
+  // Handle continue to verification
+  const handleContinueToVerification = useCallback(() => {
+    if (!aiResult) return;
+
+    setGameState('completed');
+
+    // Calculate security analysis
+    const drawingData = canvasRef.current?.exportDrawing();
+    const securityAnalysis = calculateDrawingHumanScore(
+      drawingData, 
+      prompt, 
+      drawingAnalytics
+    );
+
+    // Trigger verification
+    if (onVerified) {
+      onVerified({
+        isHuman: securityAnalysis.isHuman,
+        score: securityAnalysis.totalScore,
+        sessionId: sessionId.current,
+        type: 'drawing',
+        prompt: prompt,
+        artwork: aiResult.artwork,
+        analytics: drawingAnalytics
+      });
+    }
+  }, [aiResult, prompt, drawingAnalytics, onVerified]);
 
   // Reset game
   const handleReset = useCallback(() => {
@@ -294,8 +316,8 @@ export default function DrawingGame({
             onBrushSizeChange={setBrushSize}
             brushColor={brushColor}
             onBrushColorChange={setBrushColor}
-            canUndo={hasDrawing && drawingAnalytics.strokes.length > 0}
-            canClear={hasDrawing}
+            canUndo={drawingAnalytics.strokes.length > 0}
+            canClear={drawingAnalytics.strokes.length > 0}
           />
 
           {/* Instructions */}
@@ -319,7 +341,7 @@ export default function DrawingGame({
             />
           )}
           
-          {gameState === 'completed' && aiResult && (
+          {(gameState === 'generated' || gameState === 'completed') && aiResult && (
             <AIArtworkDisplay
               originalDrawing={canvasRef.current?.exportDrawing().imageData}
               generatedArtwork={aiResult.artwork}
@@ -336,9 +358,23 @@ export default function DrawingGame({
             targetScore={1}
             onClick={handleSubmitDrawing}
             isVerifying={isProcessing}
-            disabled={!hasDrawing || isProcessing || gameState === 'completed'}
-            className={gameState === 'completed' ? 'hidden' : ''}
+            disabled={!hasDrawing || isProcessing || gameState === 'generated' || gameState === 'completed'}
+            className={gameState === 'generated' || gameState === 'completed' ? 'hidden' : ''}
           />
+
+          {gameState === 'generated' && (
+            <motion.button
+              onClick={handleContinueToVerification}
+              className="w-full py-4 px-8 backdrop-blur-md bg-gradient-to-br from-blue-500/80 to-indigo-500/80 hover:from-blue-400/90 hover:to-indigo-400/90 text-white font-bold text-lg rounded-2xl transition-all duration-300 border border-white/20 shadow-button-3d hover:shadow-glass-hover"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.02, y: -3 }}
+              whileTap={{ scale: 0.98, y: 0 }}
+            >
+              ✨ Continue to Verification
+            </motion.button>
+          )}
 
           {gameState === 'completed' && (
             <motion.button

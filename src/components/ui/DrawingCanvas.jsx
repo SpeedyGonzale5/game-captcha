@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 
-export default function DrawingCanvas({
+const DrawingCanvas = forwardRef(({
   width = 400,
   height = 300,
   onDrawingStart,
@@ -12,7 +12,7 @@ export default function DrawingCanvas({
   brushSize = 3,
   brushColor = '#000000',
   className = ""
-}) {
+}, ref) => {
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [strokes, setStrokes] = useState([]);
@@ -169,7 +169,12 @@ export default function DrawingCanvas({
     
     setStrokes([]);
     setHasDrawn(false);
-  }, [brushColor, brushSize]);
+    
+    // Notify parent that drawing is cleared
+    if (onDrawingComplete) {
+      onDrawingComplete([]);
+    }
+  }, [brushColor, brushSize, onDrawingComplete]);
 
   // Undo last stroke
   const undo = useCallback(() => {
@@ -210,7 +215,12 @@ export default function DrawingCanvas({
     if (newStrokes.length === 0) {
       setHasDrawn(false);
     }
-  }, [strokes]);
+    
+    // Notify parent of the updated strokes
+    if (onDrawingComplete) {
+      onDrawingComplete(newStrokes);
+    }
+  }, [strokes, onDrawingComplete]);
 
   // Export drawing as image data
   const exportDrawing = useCallback(() => {
@@ -227,14 +237,12 @@ export default function DrawingCanvas({
     };
   }, [strokes, width, height, hasDrawn]);
 
-  // Expose methods to parent component
-  useEffect(() => {
-    if (canvasRef.current) {
-      canvasRef.current.clear = clear;
-      canvasRef.current.undo = undo;
-      canvasRef.current.exportDrawing = exportDrawing;
-    }
-  }, [clear, undo, exportDrawing]);
+  // Expose methods to parent component using useImperativeHandle
+  useImperativeHandle(ref, () => ({
+    clear,
+    undo,
+    exportDrawing
+  }), [clear, undo, exportDrawing]);
 
   return (
     <motion.div
@@ -268,4 +276,8 @@ export default function DrawingCanvas({
       )}
     </motion.div>
   );
-}
+});
+
+DrawingCanvas.displayName = 'DrawingCanvas';
+
+export default DrawingCanvas;
