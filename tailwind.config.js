@@ -53,19 +53,35 @@ module.exports = {
         }
       },
       backgroundImage: {
-        'game-gradient': 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)',
-        'card-gradient': 'linear-gradient(135deg, #fff1f2, #fef7f7)',
+        'game-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+        'card-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%)',
+        'button-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%)',
         'success-gradient': 'linear-gradient(135deg, #10b981, #059669)',
-        'rainbow-gradient': 'linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3)',
+        'purple-pink': 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        'blue-purple': 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
       },
       boxShadow: {
         'game': '0 30px 60px rgba(0,0,0,0.2)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+        'glass-inset': 'inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        'glass-hover': '0 12px 40px 0 rgba(31, 38, 135, 0.5)',
+        'button-3d': '0 4px 15px 0 rgba(31, 38, 135, 0.4)',
+        'button-pressed': '0 2px 8px 0 rgba(31, 38, 135, 0.4)',
         'neon-green': '0 0 5px #00ff00',
         'neon-yellow': '0 0 8px #ffff00',
       },
       dropShadow: {
         'neon-green': '0 0 5px #00ff00',
         'neon-yellow': '0 0 8px #ffff00',
+      },
+      backdropBlur: {
+        'glass': '10px',
+        'strong': '20px',
+      },
+      borderRadius: {
+        'glass': '16px',
+        'button': '12px',
       }
     },
   },

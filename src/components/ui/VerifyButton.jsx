@@ -14,22 +14,22 @@ export default function VerifyButton({
   const [isHovered, setIsHovered] = useState(false);
   
   const getButtonText = () => {
-    if (isVerifying) return '⏳ Verifying Human Skills...';
-    if (score < targetScore) return `🎮 Destroy ${targetScore - score} More Enemies`;
-    return '🎮 Verify Gaming Skills';
+    if (isVerifying) return '⏳ Creating Masterpiece...';
+    if (score < targetScore) return `🎨 Complete Your Drawing`;
+    return '🎨 Submit Drawing';
   };
 
   const getButtonStyle = () => {
     if (disabled || score < targetScore) {
-      return 'bg-gray-400 cursor-not-allowed opacity-60';
+      return 'backdrop-blur-md bg-white/10 text-white/40 cursor-not-allowed border border-white/10';
     }
-    return 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 cursor-pointer shadow-lg hover:shadow-xl';
+    return 'backdrop-blur-md bg-gradient-to-br from-emerald-500/80 to-green-600/80 hover:from-emerald-400/90 hover:to-green-500/90 text-white shadow-button-3d hover:shadow-glass-hover cursor-pointer border border-white/20';
   };
 
   return (
     <motion.button
       className={`
-        w-full py-4 px-8 rounded-2xl text-white font-bold text-lg
+        w-full py-4 px-8 rounded-2xl font-bold text-lg
         uppercase tracking-wider transition-all duration-300
         ${getButtonStyle()}
         ${className}
@@ -40,10 +40,11 @@ export default function VerifyButton({
       disabled={disabled || isVerifying}
       whileHover={!disabled && score >= targetScore ? { 
         scale: 1.02,
-        y: -2
+        y: -3
       } : {}}
       whileTap={!disabled && score >= targetScore ? { 
-        scale: 0.98 
+        scale: 0.98,
+        y: 0
       } : {}}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

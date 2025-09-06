@@ -156,29 +156,44 @@ export default function DrawingCanvas({
   // Clear canvas
   const clear = useCallback(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Reset canvas style properties
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = brushColor;
+    ctx.lineWidth = brushSize;
+    
     setStrokes([]);
     setHasDrawn(false);
-  }, []);
+  }, [brushColor, brushSize]);
 
   // Undo last stroke
   const undo = useCallback(() => {
     if (strokes.length === 0) return;
     
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     
     // Remove last stroke
     const newStrokes = strokes.slice(0, -1);
     setStrokes(newStrokes);
     
-    // Redraw all remaining strokes
+    // Clear and redraw all remaining strokes
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Reset canvas style properties
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
     newStrokes.forEach(stroke => {
-      ctx.strokeStyle = stroke.brushColor;
-      ctx.lineWidth = stroke.brushSize;
+      ctx.strokeStyle = stroke.brushColor || '#000000';
+      ctx.lineWidth = stroke.brushSize || 3;
       ctx.beginPath();
       
       stroke.points.forEach((point, index) => {

@@ -49,7 +49,15 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-game-gradient flex items-center justify-center p-4">
+    <div className="min-h-screen bg-purple-pink bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-pink-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-40 right-10 w-64 h-64 bg-indigo-400/10 rounded-full blur-3xl animate-pulse-slow"></div>
+      </div>
+      
       <DrawingGame 
         onVerified={handleVerified}
         onGameComplete={handleGameComplete}
