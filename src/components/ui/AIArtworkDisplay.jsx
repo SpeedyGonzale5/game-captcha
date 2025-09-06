@@ -1,188 +1,133 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
-export default function AIArtworkDisplay({
+const AIArtworkDisplay = ({
   originalDrawing,
   generatedArtwork,
   prompt,
-  isGenerating = false,
-  onComplete,
+  isGenerating,
   className = ""
-}) {
-  const [showArtwork, setShowArtwork] = useState(false);
-  const [audioPlaying, setAudioPlaying] = useState(false);
-
-  useEffect(() => {
-    if (generatedArtwork && !isGenerating) {
-      setTimeout(() => {
-        setShowArtwork(true);
-        if (onComplete) onComplete();
-      }, 500);
-    }
-  }, [generatedArtwork, isGenerating, onComplete]);
-
-  const playBackgroundMusic = () => {
-    setAudioPlaying(true);
-    // Mock audio play - in real implementation, would play generated music
-    setTimeout(() => setAudioPlaying(false), 30000); // 30 second demo
-  };
-
+}) => {
   if (isGenerating) {
-    return (
-      <motion.div 
-        className={`bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 text-center ${className}`}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div
-          className="text-6xl mb-4"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        >
-          🎨
-        </motion.div>
-        <h3 className="text-xl font-bold text-purple-800 mb-2">
-          Creating Your Masterpiece...
-        </h3>
-        <p className="text-purple-600 mb-4">
-          AI is transforming your "{prompt}" drawing into beautiful artwork
-        </p>
-        
-        {/* Loading animation */}
-        <div className="flex justify-center gap-2 mb-4">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-3 h-3 bg-purple-500 rounded-full"
-              animate={{ y: [0, -20, 0] }}
-              transition={{ 
-                duration: 0.8, 
-                repeat: Infinity, 
-                delay: i * 0.2 
-              }}
-            />
-          ))}
-        </div>
-        
-        <div className="text-sm text-purple-500">
-          ✨ Powered by Nano Banana AI & ElevenLabs Audio
-        </div>
-      </motion.div>
-    );
-  }
-
-  if (!showArtwork || !generatedArtwork) {
-    return null;
+    return null; // The loading state is now handled in DrawingGame.jsx
   }
 
   return (
-    <motion.div 
-      className={`bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 ${className}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="text-center mb-6">
+    <div className={`w-full ${className}`}>
+      <div className="text-center mb-8">
         <motion.div
-          className="text-4xl mb-2"
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 1, repeat: 3 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="inline-block mb-4 text-3xl"
         >
           🎉
         </motion.div>
-        <h3 className="text-2xl font-bold text-emerald-800 mb-1">
+        <motion.h2
+          className="text-3xl font-bold text-gray-800 mb-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           Your Creative Masterpiece!
-        </h3>
-        <p className="text-emerald-600">
-          Human creativity verified through your unique "{prompt}" drawing
-        </p>
+        </motion.h2>
+        <motion.p
+          className="text-gray-500"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          Human creativity verified through your unique &quot;{prompt}&quot; drawing
+        </motion.p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6 mb-6">
-        {/* Original Drawing */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <h4 className="font-semibold text-gray-700 mb-3 text-center">
-            Your Original Drawing
-          </h4>
-          <div className="flex justify-center">
-            <img 
-              src={originalDrawing}
-              alt="Original drawing"
-              className="max-w-full h-auto border border-gray-200 rounded-lg"
-              style={{ maxHeight: '200px' }}
-            />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* Original Drawing Card */}
+        <motion.div
+          className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col items-center"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <h3 className="font-semibold text-gray-700 mb-3">Your Original Drawing</h3>
+          <div className="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+            {originalDrawing && (
+              <Image
+                src={originalDrawing}
+                alt="User's original drawing"
+                width={300}
+                height={300}
+                className="rounded-md object-contain"
+              />
+            )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* AI Generated Artwork */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <h4 className="font-semibold text-gray-700 mb-3 text-center">
-            AI Enhanced Version
-          </h4>
-          <motion.div 
-            className="flex justify-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <img 
-              src={generatedArtwork.imageUrl}
-              alt="AI generated artwork"
-              className="max-w-full h-auto border border-gray-200 rounded-lg shadow-lg"
-              style={{ maxHeight: '200px' }}
-            />
-          </motion.div>
-        </div>
+        {/* AI Enhanced Version Card */}
+        <motion.div
+          className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col items-center"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <h3 className="font-semibold text-gray-700 mb-3">AI Enhanced Version</h3>
+          <div className="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+            {generatedArtwork && (
+              <Image
+                src={generatedArtwork}
+                alt={`AI generated artwork for prompt: ${prompt}`}
+                width={300}
+                height={300}
+                className="rounded-md object-cover"
+              />
+            )}
+          </div>
+        </motion.div>
       </div>
 
-      {/* AI Enhancement Info */}
-      <div className="bg-white rounded-xl p-4 mb-6">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">🎨</span>
-              <span className="font-semibold text-gray-700">Nano Banana AI</span>
-            </div>
-            <p className="text-sm text-gray-600">
-              Enhanced your drawing with professional artistic styling and vibrant colors
-            </p>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">🎵</span>
-              <span className="font-semibold text-gray-700">ElevenLabs Audio</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={playBackgroundMusic}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                  audioPlaying 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                }`}
-              >
-                {audioPlaying ? '🔊 Playing...' : '▶️ Play Theme Music'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Human Verification Badge */}
-      <motion.div 
-        className="bg-emerald-500 text-white rounded-full px-6 py-3 text-center font-bold text-lg mx-auto max-w-md"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5, delay: 0.8, type: "spring", stiffness: 500 }}
+      {/* AI Info Card */}
+      <motion.div
+        className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
       >
-        ✅ Human Creativity Verified!
-        <div className="text-sm opacity-90 mt-1">
-          Your unique artistic expression confirms human intelligence
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎨</span>
+            <div>
+              <p className="font-semibold text-gray-700">Nano Banana AI</p>
+              <p className="text-sm text-gray-500">Enhanced your drawing with professional artistic styling</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🎵</span>
+            <div>
+              <p className="font-semibold text-gray-700">ElevenLabs Audio</p>
+              <button className="text-sm text-blue-500 hover:underline">Play Theme Music</button>
+            </div>
+          </div>
         </div>
       </motion.div>
-    </motion.div>
+      
+      {/* Verification Button */}
+      <div className="text-center pt-2">
+        <motion.div
+          className="inline-flex items-center gap-2 bg-emerald-600 text-white font-semibold text-sm py-2 px-4 rounded-lg shadow-md"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Human Creativity Verified!</span>
+        </motion.div>
+      </div>
+    </div>
   );
-}
+};
+
+export default AIArtworkDisplay;

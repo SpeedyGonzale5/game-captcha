@@ -235,7 +235,7 @@ export default function DrawingGame({
   }, []);
 
   return (
-    <div className={`w-full max-w-2xl mx-auto relative ${className}`}>
+    <div className={`w-full max-w-4xl mx-auto relative ${className}`}>
       <ShineBorder
         className="absolute inset-0 rounded-3xl z-0"
         shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
@@ -252,69 +252,48 @@ export default function DrawingGame({
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-gray-200/50 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gray-300/50 rounded-full blur-3xl"></div>
         
-        {/* Security badge */}
-        <motion.div 
-          className="absolute top-6 right-6 bg-black text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Creative Security
-        </motion.div>
-
         {/* Logo */}
         <div className="relative flex items-center justify-center gap-3 mb-2 z-10">
-          <motion.div 
-            className="w-12 h-12 bg-black/80 backdrop-blur-md rounded-2xl flex items-center justify-center text-2xl border border-gray-700 text-white"
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            🧠
-          </motion.div>
           <h1 className="text-3xl font-extrabold text-black">
-            Creative CAPTCHA
+            Drawing Captcha
           </h1>
         </div>
 
-        <p className="text-black text-lg font-bold mb-8 text-center relative z-10">
-          Prove you&apos;re human by drawing!
+        <p className="text-black text-lg font-bold mb-4 text-center relative z-10">
+          {prompt}
         </p>
 
         {/* Drawing Challenge Section */}
-        <div className="relative bg-white/80 rounded-2xl p-6 mb-6 border border-gray-200 z-10 shadow-lg">
-          <div className="text-center mb-6">
-            <motion.div
-              className="text-2xl font-extrabold text-black mb-2 flex items-center justify-center gap-2"
-              animate={gameState === 'prompt' ? { scale: [1, 1.03, 1] } : {}}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              Creative Challenge
-            </motion.div>
-            <motion.div 
-              className="text-xl text-black font-extrabold"
-              key={prompt} // Re-animate when prompt changes
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {prompt}
-            </motion.div>
-          </div>
+        <div className="relative bg-white/80 rounded-2xl p-4 mb-4 border border-gray-200 z-10 shadow-lg w-full flex-grow flex flex-col">
+          <AnimatePresence>
+            {gameState === 'processing' && (
+              <motion.div
+                className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl z-20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+                <p className="mt-4 text-black font-semibold">AI is creating...</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Drawing Area */}
-          <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4 shadow-sm">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-grow flex items-center justify-center">
             <DrawingCanvas
               ref={canvasRef}
-              width={500}
-              height={350}
+              width={720}
+              height={480}
               brushSize={brushSize}
               brushColor={brushColor}
               onDrawingStart={handleDrawingStart}
               onDrawingUpdate={handleDrawingUpdate}
               onDrawingComplete={handleDrawingComplete}
-              className="mx-auto relative rounded-lg border border-dashed border-gray-300/70"
+              className="mx-auto relative rounded-lg"
             />
           </div>
-
+          
           {/* Drawing Tools */}
           <DrawingTools
             onClear={handleClear}
@@ -325,103 +304,122 @@ export default function DrawingGame({
             onBrushColorChange={setBrushColor}
             canUndo={drawingAnalytics.strokes.length > 0}
             canClear={drawingAnalytics.strokes.length > 0}
-            className="mt-4"
+            className="pt-4"
           />
-
-          {/* Instructions */}
-          <motion.div 
-            className="mt-6 text-center text-sm text-black font-bold"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-          >
-            Use your mouse or finger to draw • Express your creativity • AI will enhance your artwork
-          </motion.div>
         </div>
 
-        {/* AI Processing/Result Display */}
-        <AnimatePresence>
-          {gameState === 'processing' && (
-            <AIArtworkDisplay
-              isGenerating={true}
-              prompt={prompt}
-              className="mb-6"
-            />
-          )}
-          
-          {(gameState === 'generated' || gameState === 'completed') && aiResult && (
-            <AIArtworkDisplay
-              originalDrawing={canvasRef.current?.exportDrawing().imageData}
-              generatedArtwork={aiResult.artwork}
-              prompt={prompt}
-              className="mb-6"
-            />
-          )}
-        </AnimatePresence>
-
         {/* Action Buttons */}
-        <div className="space-y-4">
-          <VerifyButton
-            score={hasDrawing ? 1 : 0}
-            targetScore={1}
-            onClick={handleSubmitDrawing}
-            isVerifying={isProcessing}
-            disabled={!hasDrawing || isProcessing || gameState === 'generated' || gameState === 'completed'}
-            className={cn(
-              "w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90",
-              (gameState === 'generated' || gameState === 'completed') ? 'hidden' : '',
-              (!hasDrawing || isProcessing) && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            <span className="relative">SUBMIT DRAWING</span>
-          </VerifyButton>
-
-          {gameState === 'generated' && (
-            <motion.button
-              onClick={handleContinueToVerification}
-              className="w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+        <div className="space-y-4 w-full max-w-sm">
+          <div className="bg-black rounded-lg">
+            <VerifyButton
+              score={hasDrawing ? 1 : 0}
+              targetScore={1}
+              onClick={handleSubmitDrawing}
+              isVerifying={isProcessing}
+              disabled={!hasDrawing || isProcessing || gameState === 'generated' || gameState === 'completed'}
+              className={cn(
+                "w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90",
+                (gameState === 'generated' || gameState === 'completed') ? 'hidden' : '',
+                (!hasDrawing || isProcessing) && "opacity-50 cursor-not-allowed"
+              )}
             >
-              Continue to Verification
-            </motion.button>
-          )}
-
-          {gameState === 'completed' && (
-            <motion.button
-              onClick={handleReset}
-              className="w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 1 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              Create Another Masterpiece
-            </motion.button>
-          )}
+              <span className="relative">SUBMIT DRAWING</span>
+            </VerifyButton>
+          </div>
         </div>
 
         {/* Creative Encouragement */}
         {gameState === 'drawing' && (
           <motion.div
-            className="relative mt-6 text-center p-4 bg-white/90 rounded-xl border border-gray-200 z-10 shadow-sm"
+            className="relative mt-4 text-center p-3"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            <div className="text-black font-bold text-sm">
-              Let your creativity flow! There&apos;s no wrong way to draw.
-            </div>
-            <div className="text-gray-600 text-xs mt-1">
-              Your unique artistic expression helps verify you&apos;re human
+            <div className="text-gray-500 text-xs">
+              Use your mouse or finger to draw • Express your creativity
             </div>
           </motion.div>
         )}
       </motion.div>
+
+      {/* --- MASTERPIECE MODAL --- */}
+      <AnimatePresence>
+        {(gameState === 'generated' || gameState === 'completed') && aiResult && (
+          <motion.div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-gray-50 rounded-2xl shadow-2xl w-full max-w-3xl relative p-6"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <motion.button
+                onClick={handleReset}
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors z-10 p-1 bg-gray-100 rounded-full"
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </motion.button>
+              
+              <AIArtworkDisplay
+                originalDrawing={canvasRef.current?.exportDrawing().imageData}
+                generatedArtwork={aiResult.artwork}
+                prompt={prompt}
+              />
+
+              <div className="mt-6 px-2">
+                {gameState === 'generated' && (
+                  <motion.button
+                    onClick={handleContinueToVerification}
+                    className="w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Continue to Verification
+                  </motion.button>
+                )}
+
+                {gameState === 'completed' && (
+                  <motion.button
+                    onClick={handleReset}
+                    className="w-full py-3 px-6 bg-black text-white font-semibold text-sm rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:bg-black/90"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Create Another Masterpiece
+                  </motion.button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
