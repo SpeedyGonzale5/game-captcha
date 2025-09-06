@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { calculateHumanScore, generateSessionId } from '@/lib/securityAnalytics';
+import { calculateDrawingHumanScore } from '@/lib/drawingAnalytics';
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { analytics, gameType = 'shooter', score = 0 } = body;
+    const { analytics, gameType = 'drawing', score = 0, drawingData, prompt } = body;
 
     // Validate required data
     if (!analytics) {
@@ -14,8 +15,21 @@ export async function POST(request) {
       );
     }
 
-    // Perform security analysis
-    const humanAnalysis = calculateHumanScore(analytics);
+    // Perform security analysis based on game type
+    let humanAnalysis;
+    if (gameType === 'drawing') {
+      if (!drawingData || !prompt) {
+        return NextResponse.json(
+          { error: 'Drawing data and prompt are required for drawing verification' },
+          { status: 400 }
+        );
+      }
+      humanAnalysis = calculateDrawingHumanScore(drawingData, prompt, analytics);
+    } else {
+      // Fallback to original shooter game analysis
+      humanAnalysis = calculateHumanScore(analytics);
+    }
+    
     const sessionId = generateSessionId();
 
     // Log verification attempt (in production, store in database)

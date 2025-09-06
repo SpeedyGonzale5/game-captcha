@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import ShooterGame from '@/components/games/ShooterGame';
+import DrawingGame from '@/components/games/DrawingGame';
 
 export default function Demo() {
-  const [activeDemo, setActiveDemo] = useState('shooter');
+  const [activeDemo, setActiveDemo] = useState('drawing');
   const [verificationResults, setVerificationResults] = useState([]);
 
   const handleVerified = (result) => {
@@ -19,10 +19,16 @@ export default function Demo() {
 
   const demos = [
     {
+      id: 'drawing',
+      name: '🎨 Creative Drawing',
+      description: 'Draw objects and get AI-generated artwork as verification',
+      component: DrawingGame
+    },
+    {
       id: 'shooter',
-      name: '🎮 Shooter Game',
+      name: '🎮 Shooter Game (Legacy)',
       description: 'Click to shoot enemies and prove your human reflexes',
-      component: ShooterGame
+      component: null // Removed for now
     }
     // More games will be added here
   ];
@@ -125,25 +131,35 @@ export default function Demo() {
 
               {/* Game Container */}
               <div className="flex justify-center bg-game-gradient p-8 rounded-xl">
-                {activeDemo === 'shooter' && (
-                  <ShooterGame
+                {activeDemo === 'drawing' && (
+                  <DrawingGame
                     onVerified={handleVerified}
                     onGameComplete={handleGameComplete}
                   />
                 )}
+                {activeDemo === 'shooter' && (
+                  <div className="text-center text-white p-8">
+                    <div className="text-4xl mb-4">🚧</div>
+                    <div className="text-xl font-bold mb-2">Legacy Game Mode</div>
+                    <div className="text-gray-200">
+                      The shooter game has been replaced with creative drawing challenges.
+                      <br />Try the new drawing experience above!
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Instructions */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-semibold text-blue-900 mb-2">
-                  🎯 How it works:
+              <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+                <h3 className="font-semibold text-purple-900 mb-2">
+                  🎨 How it works:
                 </h3>
-                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                  <li>Move your mouse to aim</li>
-                  <li>Click to shoot at the alien enemies (👾)</li>
-                  <li>Destroy 3 enemies to complete the challenge</li>
-                  <li>Your behavior is analyzed for human patterns</li>
-                  <li>Get verified as human!</li>
+                <ol className="text-sm text-purple-800 space-y-1 list-decimal list-inside">
+                  <li>Get a random drawing prompt (like &quot;Draw a fish&quot;)</li>
+                  <li>Use your mouse or finger to draw on the canvas</li>
+                  <li>Customize with different colors and brush sizes</li>
+                  <li>AI transforms your drawing into beautiful artwork</li>
+                  <li>Your creative patterns verify you&apos;re human!</li>
                 </ol>
               </div>
             </div>

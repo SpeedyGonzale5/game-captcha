@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ShooterGame from '@/components/games/ShooterGame';
+import DrawingGame from '@/components/games/DrawingGame';
 
 export default function EmbedPage() {
   const [verificationResult, setVerificationResult] = useState(null);
@@ -76,7 +76,7 @@ export default function EmbedPage() {
 
   return (
     <div className="min-h-screen bg-game-gradient flex items-center justify-center p-4">
-      <ShooterGame 
+      <DrawingGame 
         onVerified={handleVerified}
         onGameComplete={handleGameComplete}
         className="transform scale-90"

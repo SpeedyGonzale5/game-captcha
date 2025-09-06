@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import ShooterGame from '@/components/games/ShooterGame';
+import DrawingGame from '@/components/games/DrawingGame';
 
 export default function Home() {
   const [verificationResult, setVerificationResult] = useState(null);
@@ -30,7 +30,7 @@ export default function Home() {
             HUMAN VERIFIED!
           </h1>
           <p className="text-gray-600 mb-4">
-            Your gaming skills prove you&apos;re not a bot. Access granted!
+            Your creativity proves you&apos;re not a bot. Enjoy your artwork!
           </p>
           <div className="bg-green-50 border-2 border-green-200 rounded-lg p-3 mb-4">
             <p className="text-green-800 font-semibold">
@@ -50,7 +50,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-game-gradient flex items-center justify-center p-4">
-      <ShooterGame 
+      <DrawingGame 
         onVerified={handleVerified}
         onGameComplete={handleGameComplete}
       />
