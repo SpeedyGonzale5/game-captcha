@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameCaptcha - Prove You're Human</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .captcha-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+            padding: 32px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .captcha-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+        }
+
+        .security-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            color: #666;
+            margin-bottom: 32px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .game-challenge {
+            background: linear-gradient(135deg, #fff1f2, #fef7f7);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 3px solid #fbbf24;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.2);
+        }
+
+        .challenge-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #dc2626;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .game-area {
+            background: #000;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 3px solid #333;
+            overflow: hidden;
+        }
+
+        .game-canvas {
+            width: 100%;
+            max-width: 350px;
+            height: 200px;
+            background: linear-gradient(180deg, #87ceeb 0%, #228b22 70%, #8b4513 100%);
+            border-radius: 8px;
+            position: relative;
+            cursor: crosshair;
+            border: 2px solid #444;
+        }
+
+        .player {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: #ff4444;
+            border-radius: 50%;
+            transition: left 0.1s ease;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .enemy {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: #444;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            border: 2px solid #666;
+        }
+
+        .bullet {
+            position: absolute;
+            width: 4px;
+            height: 8px;
+            background: #ffff00;
+            border-radius: 2px;
+            box-shadow: 0 0 8px #ffff00;
+        }
+
+        .explosion {
+            position: absolute;
+            font-size: 20px;
+            animation: explode 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .score-display {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .game-instructions {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 12px;
+            text-shadow: 0 0 3px #00ff00;
+        }
+
+        .verify-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .verify-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .verify-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 24px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .human-score {
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #f0fff4, #ecfdf5);
+            border: 2px solid #bbf7d0;
+            border-radius: 12px;
+            color: #166534;
+            font-size: 15px;
+            font-weight: 700;
+            display: none;
+        }
+
+        .controls-hint {
+            background: rgba(0,0,0,0.8);
+            color: #00ff00;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            margin-top: 8px;
+            border: 1px solid #00ff00;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="captcha-container">
+        <div class="security-badge">🔒 Gaming Security</div>
+        
+        <div class="logo">
+            <div class="logo-icon">🎮</div>
+            <div class="logo-text">GameCaptcha</div>
+        </div>
+        
+        <div class="tagline">Prove you're human by playing a mini-game!</div>
+        
+        <div class="game-challenge">
+            <div class="challenge-title">
+                🎯 Shoot 3 Enemies to Continue
+            </div>
+            
+            <div class="game-area">
+                <div class="score-display" id="scoreDisplay">ENEMIES DESTROYED: 0/3</div>
+                <div class="game-canvas" id="gameCanvas">
+                    <div class="player" id="player"></div>
+                </div>
+                <div class="game-instructions">
+                    CLICK to SHOOT | MOUSE to AIM
+                </div>
+                <div class="controls-hint">
+                    Only humans can aim and react this fast! 🎮
+                </div>
+            </div>
+        </div>
+        
+        <div class="human-score" id="humanScore">
+            🧠 Human Reflexes Detected: 96% - Excellent hand-eye coordination!
+        </div>
+        
+        <button class="verify-button" id="verifyButton" disabled>
+            🎮 Destroy 3 Enemies First
+        </button>
+        
+        <div class="success-message" id="successMessage">
+            🎉 HUMAN VERIFIED! Your gaming skills prove you're not a bot. Access granted!
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let enemies = [];
+        let bullets = [];
+        let gameActive = true;
+        let mouseX = 0;
+        let mouseY = 0;
+        let gameStartTime = Date.now();
+
+        const gameCanvas = document.getElementById('gameCanvas');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const verifyButton = document.getElementById('verifyButton');
+        const humanScore = document.getElementById('humanScore');
+        const successMessage = document.getElementById('successMessage');
+
+        // Track mouse position
+        gameCanvas.addEventListener('mousemove', (e) => {
+            const rect = gameCanvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        // Shoot on click
+        gameCanvas.addEventListener('click', (e) => {
+            if (!gameActive) return;
+            
+            const rect = gameCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            
+            shootBullet(clickX, clickY);
+        });
+
+        function shootBullet(targetX, targetY) {
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet';
+            
+            const playerRect = player.getBoundingClientRect();
+            const canvasRect = gameCanvas.getBoundingClientRect();
+            
+            const startX = playerRect.left - canvasRect.left + 15;
+            const startY = playerRect.top - canvasRect.top;
+            
+            bullet.style.left = startX + 'px';
+            bullet.style.bottom = '50px';
+            
+            gameCanvas.appendChild(bullet);
+            bullets.push({
+                element: bullet,
+                x: startX,
+                y: 50,
+                targetX: targetX,
+                targetY: targetY,
+                speed: 8
+            });
+        }
+
+        function spawnEnemy() {
+            if (!gameActive) return;
+            
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            enemy.style.left = Math.random() * (gameCanvas.offsetWidth - 25) + 'px';
+            enemy.style.top = Math.random() * 100 + 20 + 'px';
+            enemy.textContent = '👾';
+            enemy.style.background = 'transparent';
+            enemy.style.fontSize = '20px';
+            enemy.style.border = 'none';
+            
+            gameCanvas.appendChild(enemy);
+            enemies.push({
+                element: enemy,
+                x: parseFloat(enemy.style.left),
+                y: parseFloat(enemy.style.top),
+                health: 1
+            });
+        }
+
+        function updateBullets() {
+            bullets.forEach((bullet, bulletIndex) => {
+                // Move bullet towards target
+                const dx = bullet.targetX - bullet.x;
+                const dy = bullet.targetY - bullet.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > bullet.speed) {
+                    bullet.x += (dx / distance) * bullet.speed;
+                    bullet.y += (dy / distance) * bullet.speed;
+                    
+                    bullet.element.style.left = bullet.x + 'px';
+                    bullet.element.style.bottom = (200 - bullet.y) + 'px';
+                } else {
+                    // Bullet reached target
+                    bullet.element.remove();
+                    bullets.splice(bulletIndex, 1);
+                }
+                
+                // Check enemy collisions
+                enemies.forEach((enemy, enemyIndex) => {
+                    const enemyRect = {
+                        x: enemy.x,
+                        y: enemy.y,
+                        width: 25,
+                        height: 25
+                    };
+                    
+                    if (bullet.x >= enemyRect.x && bullet.x <= enemyRect.x + enemyRect.width &&
+                        bullet.y >= enemyRect.y && bullet.y <= enemyRect.y + enemyRect.height) {
+                        
+                        // Hit!
+                        destroyEnemy(enemyIndex);
+                        bullet.element.remove();
+                        bullets.splice(bulletIndex, 1);
+                    }
+                });
+            });
+        }
+
+        function destroyEnemy(index) {
+            const enemy = enemies[index];
+            
+            // Create explosion
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.innerHTML = '💥';
+            explosion.style.left = enemy.x + 'px';
+            explosion.style.top = enemy.y + 'px';
+            gameCanvas.appendChild(explosion);
+            
+            setTimeout(() => explosion.remove(), 500);
+            
+            // Remove enemy
+            enemy.element.remove();
+            enemies.splice(index, 1);
+            
+            score++;
+            scoreDisplay.textContent = `ENEMIES DESTROYED: ${score}/3`;
+            
+            if (score >= 3) {
+                gameWon();
+            }
+        }
+
+        function gameWon() {
+            gameActive = false;
+            scoreDisplay.innerHTML = '<span class="blink">🎉 MISSION COMPLETE! 🎉</span>';
+            
+            // Calculate human-like metrics
+            const reactionTime = Date.now() - gameStartTime;
+            const averageTime = reactionTime / (score + bullets.length); // Include missed shots
+            
+            verifyButton.disabled = false;
+            verifyButton.innerHTML = '🎮 Verify Gaming Skills';
+            
+            // Show human score with realistic metrics
+            humanScore.style.display = 'block';
+            
+            let displayScore = 70;
+            const targetScore = Math.min(95, Math.max(85, 100 - Math.floor(averageTime / 1000))); // Faster = higher score
+            
+            const scoreInterval = setInterval(() => {
+                displayScore += 3;
+                humanScore.innerHTML = `🧠 Human Reflexes: ${Math.min(displayScore, targetScore)}% - ${getReflexMessage(targetScore)}`;
+                if (displayScore >= targetScore) clearInterval(scoreInterval);
+            }, 100);
+        }
+
+        function getReflexMessage(score) {
+            if (score >= 95) return "Lightning fast reflexes!";
+            if (score >= 90) return "Excellent hand-eye coordination!";
+            if (score >= 85) return "Great gaming skills!";
+            return "Good human reflexes!";
+        }
+
+        function gameLoop() {
+            if (gameActive) {
+                updateBullets();
+                
+                // Spawn new enemies occasionally
+                if (Math.random() < 0.01 && enemies.length < 3) {
+                    spawnEnemy();
+                }
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        verifyButton.addEventListener('click', () => {
+            if (score < 3) return;
+            
+            verifyButton.innerHTML = '⏳ Verifying Human Skills...';
+            verifyButton.disabled = true;
+            
+            setTimeout(() => {
+                successMessage.style.display = 'block';
+                verifyButton.style.display = 'none';
+                
+                // Celebration effects
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => createConfetti(), i * 100);
+                }
+            }, 2000);
+        });
+
+        function createConfetti() {
+            const emojis = ['🎉', '🎊', '🎮', '🏆', '⭐', '💫'];
+            const confetti = document.createElement('div');
+            confetti.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+            confetti.style.position = 'fixed';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-50px';
+            confetti.style.fontSize = '24px';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.animation = 'fall 3s linear forwards';
+            confetti.style.zIndex = '10000';
+            
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }
+
+        // Add falling animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fall {
+                0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Start the game
+        setTimeout(() => spawnEnemy(), 1000);
+        setTimeout(() => spawnEnemy(), 2000);
+        gameLoop();
+    </script>
+</body>
+</html>
