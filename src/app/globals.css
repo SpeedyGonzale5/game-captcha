@@ -279,7 +279,16 @@ body {
     transform: translate(100px,100px) rotate(112deg);
     }
   }
-}
+  --animate-pulse: pulse var(--duration) ease-out infinite
+;
+  @keyframes pulse {
+  0%, 100% {
+    boxShadow: 0 0 0 0 var(--pulse-color);
+    }
+  50% {
+    boxShadow: 0 0 0 8px var(--pulse-color);
+    }
+  }}
 
 @layer base {
   * {

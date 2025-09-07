@@ -25,6 +25,10 @@ export default function DrawingGame({
   const [hasDrawing, setHasDrawing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [aiResult, setAiResult] = useState(null);
+  const [loadingStates, setLoadingStates] = useState({
+    imageGenerated: false,
+    audioGenerated: false,
+  });
   const [drawingAnalytics, setDrawingAnalytics] = useState({
     startTime: null,
     strokes: [],
@@ -126,63 +130,53 @@ export default function DrawingGame({
     });
   }, []);
 
-  // Submit drawing for AI processing
-  const handleSubmitDrawing = useCallback(async () => {
-    if (!hasDrawing || !canvasRef.current) return;
+  const handleSubmitDrawing = async () => {
+    if (!canvasRef.current || isProcessing) return;
 
+    // 1. Enter processing state and show modal immediately with loading skeletons
     setIsProcessing(true);
-    setGameState('processing');
+    setGameState('generated'); // Show modal immediately
+    setLoadingStates({ imageGenerated: false, audioGenerated: false });
+    setAiResult({ artwork: null, audio: null }); // Initialize with null values
+    const drawingData = canvasRef.current.exportDrawing();
 
     try {
-      // Export drawing data
-      const drawingData = canvasRef.current.exportDrawing();
-      
-      // Validate drawing content
-      const validation = validateDrawingContent(drawingData, prompt);
-      if (!validation.isValid) {
-        alert(validation.reason + '. Please try drawing again.');
-        setIsProcessing(false);
-        setGameState('drawing');
-        return;
+      // 2. Call the new backend API route
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageData: drawingData.imageData,
+          prompt: prompt
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API call failed with status: ${response.status}`);
       }
 
-      // Process with AI
-      const aiProcessingResult = await processDrawingWithAI(drawingData, prompt);
-      
-      if (!aiProcessingResult.success) {
-        throw new Error('AI processing failed');
-      }
+      const result = await response.json();
 
-      setAiResult(aiProcessingResult);
-      
-      // Calculate security analytics
-      const securityAnalysis = calculateDrawingHumanScore(
-        drawingData, 
-        prompt, 
-        drawingAnalytics
-      );
-
-      // Complete the game
-      if (onGameComplete) {
-        onGameComplete({
-          ...drawingAnalytics,
-          drawingData,
-          validation,
-          aiResult: aiProcessingResult,
-          securityAnalysis
-        });
-      }
-
+      // 3. Update state with the real AI-generated content URLs
+      // The modal will show even if audio generation failed
+      setAiResult(result);
+      setLoadingStates({
+        imageGenerated: result.imageGenerated || false,
+        audioGenerated: result.audioGenerated || false,
+      });
       setGameState('generated');
-      setIsProcessing(false);
 
     } catch (error) {
-      console.error('Drawing processing error:', error);
-      alert('Something went wrong processing your drawing. Please try again.');
-      setIsProcessing(false);
+      console.error("Failed to generate AI artwork:", error);
+      alert("Sorry, there was an issue creating the AI masterpiece. Please try again.");
+      // Reset state on failure
       setGameState('drawing');
+    } finally {
+      setIsProcessing(false);
     }
-  }, [hasDrawing, prompt, drawingAnalytics, onGameComplete, onVerified]);
+  };
 
   // Handle continue to verification
   const handleContinueToVerification = useCallback(() => {
@@ -220,6 +214,7 @@ export default function DrawingGame({
     setHasDrawing(false);
     setIsProcessing(false);
     setAiResult(null);
+    setLoadingStates({ imageGenerated: false, audioGenerated: false });
     sessionId.current = generateSessionId();
     setDrawingAnalytics({
       startTime: Date.now(),
@@ -254,15 +249,19 @@ export default function DrawingGame({
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gray-300/50 rounded-full blur-3xl"></div>
         
         {/* Logo */}
-        <div className="relative flex items-center justify-center gap-3 mb-2 z-10">
-          <h1 className="text-3xl font-extrabold text-black">
+        <div className="relative flex items-center justify-center gap-3 mb-4 z-10">
+          <h1 className="text-5xl font-black text-black tracking-tight leading-tight">
             Drawing Captcha
           </h1>
         </div>
 
-        <p className="text-black text-lg font-bold mb-4 text-center relative z-10">
-          {prompt}
-        </p>
+        <div className="flex justify-center mb-6 z-10">
+          <div className="inline-flex items-center px-4 py-2 bg-gray-100/80 rounded-full border border-gray-200/50 backdrop-blur-sm">
+            <span className="text-gray-700 text-sm font-medium tracking-wide">
+              {prompt}
+            </span>
+          </div>
+        </div>
 
         {/* Drawing Challenge Section */}
         <div className="relative bg-white/80 rounded-2xl p-4 mb-4 border border-gray-200 z-10 shadow-lg w-full flex-grow flex flex-col">
@@ -325,7 +324,7 @@ export default function DrawingGame({
                 (!hasDrawing || isProcessing) && "opacity-50 cursor-not-allowed"
               )}
             >
-              <span className="relative">SUBMIT DRAWING</span>
+              <span className="relative text-white font-bold tracking-wide">COMPLETE YOUR DRAWING</span>
             </VerifyButton>
           </div>
         </div>
@@ -386,7 +385,11 @@ export default function DrawingGame({
               <AIArtworkDisplay
                 originalDrawing={canvasRef.current?.exportDrawing().imageData}
                 generatedArtwork={aiResult.artwork}
+                audioUrl={aiResult.audio}
                 prompt={prompt}
+                isGenerating={isProcessing}
+                imageGenerated={loadingStates.imageGenerated}
+                audioGenerated={loadingStates.audioGenerated}
               />
 
               <div className="mt-6 px-2">
