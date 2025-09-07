@@ -15,7 +15,7 @@ const AIArtworkDisplay = ({
   audioGenerated = false,
   className = ""
 }) => {
-  const [showEnhanced, setShowEnhanced] = useState(false);
+  const [showEnhanced, setShowEnhanced] = useState(true);
   const audioRef = useRef(null);
 
   // Auto-play audio when it becomes available

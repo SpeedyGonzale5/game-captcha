@@ -269,8 +269,8 @@ const DrawingCanvas = forwardRef(({
       
       {!hasDrawn && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <div className="text-gray-500 text-base font-medium mb-4">Start drawing here</div>
           {placeholderComponent || <div className="text-2xl mb-2">✏️</div>}
-          <div className="text-gray-400 text-sm mt-2">Start drawing here</div>
         </div>
       )}
     </motion.div>

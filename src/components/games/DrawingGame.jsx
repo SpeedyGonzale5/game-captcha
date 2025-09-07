@@ -256,8 +256,8 @@ export default function DrawingGame({
         </div>
 
         <div className="flex justify-center mb-6 z-10">
-          <div className="inline-flex items-center px-4 py-2 bg-gray-100/80 rounded-full border border-gray-200/50 backdrop-blur-sm">
-            <span className="text-gray-700 text-sm font-medium tracking-wide">
+          <div className="inline-flex items-center px-6 py-3 bg-blue-50/90 rounded-full border-2 border-blue-200/70 backdrop-blur-sm shadow-lg">
+            <span className="text-blue-800 text-lg font-semibold tracking-wide">
               {prompt}
             </span>
           </div>

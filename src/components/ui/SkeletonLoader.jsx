@@ -144,35 +144,56 @@ export const TextSkeleton = ({ lines = 2, className = "" }) => {
 export const OverlaySkeleton = ({ className = "" }) => {
   return (
     <motion.div
-      className={`absolute inset-0 bg-white/20 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center gap-4 ${className}`}
+      className={`absolute inset-0 bg-white/5 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center p-6 ${className}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Google Gemini-style loading bars */}
-      <div className="flex flex-col gap-4 w-3/4 max-w-xs">
+      {/* Google Gemini-style gradient box skeleton that fills the image area */}
+      <motion.div
+        className="w-full h-full rounded-lg overflow-hidden bg-gray-50/50"
+        animate={{
+          scale: [1, 1.01, 1],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      >
+        {/* Main loading gradient that covers the entire image area */}
         <div
-          className="h-5 w-10/12 origin-left animate-loading rounded-sm bg-gradient-to-r from-pink-100 from-30% via-pink-500/60 to-pink-100 to-70% bg-[length:200%] opacity-0"
+          className="w-full h-full origin-left animate-loading rounded-lg bg-gradient-to-r from-blue-50 from-30% via-blue-300/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
           style={{ animationDelay: '100ms' }}
         />
-        <div
-          className="h-5 w-full origin-left animate-loading rounded-sm bg-gradient-to-r from-pink-500/60 via-purple-100 via-30% to-pink-500/60 to-60% bg-[length:200%] opacity-0"
-          style={{ animationDelay: '200ms' }}
-        />
-        <div
-          className="h-5 w-3/5 origin-left animate-loading rounded-sm bg-gradient-to-r from-pink-100 from-40% via-pink-500/60 to-pink-100 to-70% bg-[length:200%] opacity-0"
-          style={{ animationDelay: '300ms' }}
-        />
-      </div>
-      
-      {/* Subtle text */}
-      <motion.div
-        className="text-xs text-gray-500 text-center mt-2"
-        animate={{ opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        AI enhancing...
+        
+        {/* Overlay gradient bars for extra Gemini effect */}
+        <div className="absolute inset-6 flex flex-col justify-center gap-4">
+          <div
+            className="h-6 w-4/5 origin-left animate-loading rounded bg-gradient-to-r from-blue-100 from-30% via-blue-400/60 to-blue-100 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '200ms' }}
+          />
+          <div
+            className="h-6 w-full origin-left animate-loading rounded bg-gradient-to-r from-blue-100 from-30% via-blue-400/60 to-blue-100 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '300ms' }}
+          />
+          <div
+            className="h-6 w-3/5 origin-left animate-loading rounded bg-gradient-to-r from-blue-100 from-30% via-blue-400/60 to-blue-100 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '400ms' }}
+          />
+        </div>
+        
+        {/* Centered loading text */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.div
+            className="text-sm text-gray-600 font-medium bg-white/80 px-4 py-2 rounded-full backdrop-blur-sm"
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            AI enhancing...
+          </motion.div>
+        </div>
       </motion.div>
     </motion.div>
   );
