@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ImageSkeleton, AudioSkeleton, TextSkeleton } from './SkeletonLoader';
+import { useState } from 'react';
+import { ImageSkeleton, AudioSkeleton, TextSkeleton, OverlaySkeleton } from './SkeletonLoader';
 
 const AIArtworkDisplay = ({
   originalDrawing,
@@ -14,6 +15,7 @@ const AIArtworkDisplay = ({
   audioGenerated = false,
   className = ""
 }) => {
+  const [showEnhanced, setShowEnhanced] = useState(false);
 
   return (
     <div className={`w-full ${className}`}>
@@ -44,68 +46,102 @@ const AIArtworkDisplay = ({
         </motion.p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* Original Drawing Card */}
+      {/* Main Image Display with Overlay */}
+      <div className="relative mb-8">
         <motion.div
-          className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col items-center"
+          className="relative w-full max-w-lg mx-auto"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <h3 className="font-semibold text-gray-700 mb-3">Your Original Drawing</h3>
-          <div className="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-            {originalDrawing && (
-              <Image src={originalDrawing} alt="User's original drawing" width={300} height={300} className="rounded-md object-contain" />
-            )}
-          </div>
-        </motion.div>
-
-        {/* AI Enhanced Version Card */}
-        <motion.div
-          className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col items-center"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <h3 className="font-semibold text-gray-700 mb-3">AI Enhanced Version</h3>
-          <div className="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-            <AnimatePresence mode="wait">
+          {/* Background Original Drawing */}
+          <div className="relative aspect-square bg-white rounded-2xl shadow-lg border border-gray-200 p-6 overflow-hidden">
+            <div className="w-full h-full bg-gray-50 rounded-lg flex items-center justify-center">
+              {originalDrawing && (
+                <Image 
+                  src={originalDrawing} 
+                  alt="User's original drawing" 
+                  width={400} 
+                  height={400} 
+                  className="rounded-lg object-contain w-full h-full" 
+                />
+              )}
+            </div>
+            
+            {/* Overlay Skeleton or Enhanced Image */}
+            <AnimatePresence>
               {!imageGenerated ? (
-                <ImageSkeleton key="image-skeleton" className="w-full h-full" />
-              ) : generatedArtwork ? (
+                <OverlaySkeleton key="overlay-skeleton" />
+              ) : generatedArtwork && (
                 <motion.div
-                  key="generated-image"
+                  key="enhanced-overlay"
+                  className="absolute inset-0 p-6"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="w-full h-full"
+                  transition={{ duration: 0.7, type: "spring" }}
+                  drag="x"
+                  dragConstraints={{ left: -100, right: 100 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x > 50) {
+                      setShowEnhanced(false);
+                    } else if (info.offset.x < -50) {
+                      setShowEnhanced(true);
+                    }
+                  }}
+                  style={{
+                    x: showEnhanced ? 0 : 0,
+                  }}
                 >
-                  <Image 
-                    src={generatedArtwork} 
-                    alt={`AI generated artwork for prompt: ${prompt}`} 
-                    width={300} 
-                    height={300} 
-                    className="rounded-md object-cover w-full h-full" 
-                  />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="image-error"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center text-gray-500 p-4"
-                >
-                  <p className="text-sm">Image generation failed</p>
-                  <button 
-                    onClick={() => window.location.reload()} 
-                    className="text-xs text-blue-500 hover:underline mt-1"
-                  >
-                    Try again
-                  </button>
+                  <div className="relative w-full h-full bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden group cursor-grab active:cursor-grabbing">
+                    <Image 
+                      src={generatedArtwork} 
+                      alt={`AI generated artwork for prompt: ${prompt}`} 
+                      width={400} 
+                      height={400} 
+                      className="rounded-lg object-cover w-full h-full" 
+                    />
+                    
+                    {/* Swipe hint */}
+                    <div className="absolute bottom-2 left-2 right-2 bg-black/70 text-white text-xs py-1 px-2 rounded text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      Swipe to compare
+                    </div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
+          
+          {/* Toggle buttons */}
+          {imageGenerated && generatedArtwork && (
+            <motion.div
+              className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <button
+                onClick={() => setShowEnhanced(false)}
+                className={`px-3 py-1 text-xs rounded-full transition-all ${
+                  !showEnhanced 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                }`}
+              >
+                Original
+              </button>
+              <button
+                onClick={() => setShowEnhanced(true)}
+                className={`px-3 py-1 text-xs rounded-full transition-all ${
+                  showEnhanced 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                }`}
+              >
+                Enhanced
+              </button>
+            </motion.div>
+          )}
         </motion.div>
       </div>
 

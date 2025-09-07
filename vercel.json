@@ -9,6 +9,9 @@
     },
     "src/app/api/analytics/route.js": {
       "maxDuration": 5
+    },
+    "src/app/api/generate/route.js": {
+      "maxDuration": 30
     }
   },
   "headers": [
