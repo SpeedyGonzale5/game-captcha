@@ -16,17 +16,58 @@ const AIArtworkDisplay = ({
   className = ""
 }) => {
   const [showEnhanced, setShowEnhanced] = useState(true);
+  const [hasAttemptedAutoplay, setHasAttemptedAutoplay] = useState(false);
   const audioRef = useRef(null);
 
   // Auto-play audio when it becomes available
   useEffect(() => {
-    if (audioGenerated && audioUrl && audioUrl !== "#" && audioRef.current) {
-      audioRef.current.volume = 0.3; // Set volume to 30%
-      audioRef.current.play().catch(error => {
-        console.log("Auto-play failed:", error);
-      });
+    const playAudio = async () => {
+      if (audioGenerated && audioUrl && audioUrl !== "#" && audioRef.current && !hasAttemptedAutoplay) {
+        setHasAttemptedAutoplay(true);
+        
+        try {
+          console.log("Attempting to auto-play audio...");
+          
+          // Set volume to 30% immediately
+          audioRef.current.volume = 0.3;
+          
+          // Add event listeners for when audio is ready
+          const handleCanPlay = async () => {
+            try {
+              audioRef.current.currentTime = 0;
+              await audioRef.current.play();
+              console.log("Audio auto-play successful at 30% volume");
+            } catch (playError) {
+              console.log("Auto-play blocked by browser:", playError.message);
+            }
+          };
+
+          if (audioRef.current.readyState >= 2) {
+            // Audio is already loaded enough to play
+            await handleCanPlay();
+          } else {
+            // Wait for audio to be ready
+            audioRef.current.addEventListener('canplay', handleCanPlay, { once: true });
+            audioRef.current.load();
+          }
+          
+        } catch (error) {
+          console.log("Auto-play setup failed:", error.message);
+        }
+      }
+    };
+
+    // Delay slightly to ensure the audio element is properly mounted
+    const timeoutId = setTimeout(playAudio, 200);
+    return () => clearTimeout(timeoutId);
+  }, [audioGenerated, audioUrl, hasAttemptedAutoplay]);
+
+  // Reset autoplay attempt when new audio is generated
+  useEffect(() => {
+    if (!audioGenerated) {
+      setHasAttemptedAutoplay(false);
     }
-  }, [audioGenerated, audioUrl]);
+  }, [audioGenerated]);
 
   return (
     <div className={`w-full ${className}`}>
@@ -184,7 +225,28 @@ const AIArtworkDisplay = ({
                     transition={{ duration: 0.5 }}
                     className="mt-2"
                   >
-                    <audio ref={audioRef} controls className="w-full">
+                    <audio 
+                      ref={audioRef} 
+                      controls 
+                      className="w-full"
+                      preload="auto"
+                      onLoadedData={() => {
+                        if (audioRef.current) {
+                          audioRef.current.volume = 0.3;
+                          console.log("Audio loaded, volume set to 30%");
+                        }
+                      }}
+                      onCanPlay={() => {
+                        if (audioRef.current) {
+                          audioRef.current.volume = 0.3;
+                        }
+                      }}
+                      onVolumeChange={() => {
+                        if (audioRef.current && audioRef.current.volume !== 0.3) {
+                          console.log("Volume changed to:", audioRef.current.volume);
+                        }
+                      }}
+                    >
                       <source src={audioUrl} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>

@@ -144,57 +144,74 @@ export const TextSkeleton = ({ lines = 2, className = "" }) => {
 export const OverlaySkeleton = ({ className = "" }) => {
   return (
     <motion.div
-      className={`absolute inset-0 bg-white/5 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center p-6 ${className}`}
+      className={`absolute inset-0 bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden ${className}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Google Gemini-style gradient box skeleton that fills the image area */}
-      <motion.div
-        className="w-full h-full rounded-lg overflow-hidden bg-gray-50/50"
-        animate={{
-          scale: [1, 1.01, 1],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      >
-        {/* Main loading gradient that covers the entire image area */}
-        <div
-          className="w-full h-full origin-left animate-loading rounded-lg bg-gradient-to-r from-blue-50 from-30% via-blue-300/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
-          style={{ animationDelay: '100ms' }}
-        />
+      {/* Full-size Gemini loading animation that covers the entire image area */}
+      <div className="w-full h-full relative">
         
-        {/* Overlay gradient bars for extra Gemini effect */}
-        <div className="absolute inset-6 flex flex-col justify-center gap-4">
+        {/* Background gradient bars that fill the entire area */}
+        <div className="absolute inset-0 flex flex-col justify-center gap-4 p-8">
           <div
-            className="h-6 w-4/5 origin-left animate-loading rounded bg-gradient-to-r from-blue-100 from-30% via-blue-400/60 to-blue-100 to-70% bg-[length:200%] opacity-0"
+            className="h-6 w-4/5 origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '100ms' }}
+          />
+          <div
+            className="h-6 w-full origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
             style={{ animationDelay: '200ms' }}
           />
           <div
-            className="h-6 w-full origin-left animate-loading rounded bg-gradient-to-r from-blue-100 from-30% via-blue-400/60 to-blue-100 to-70% bg-[length:200%] opacity-0"
+            className="h-6 w-3/4 origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
             style={{ animationDelay: '300ms' }}
           />
           <div
-            className="h-6 w-3/5 origin-left animate-loading rounded bg-gradient-to-r from-blue-100 from-30% via-blue-400/60 to-blue-100 to-70% bg-[length:200%] opacity-0"
+            className="h-6 w-5/6 origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
             style={{ animationDelay: '400ms' }}
+          />
+          <div
+            className="h-6 w-2/3 origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '500ms' }}
+          />
+          <div
+            className="h-6 w-4/5 origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '600ms' }}
+          />
+          <div
+            className="h-6 w-1/2 origin-left animate-loading rounded bg-gradient-to-r from-blue-50 from-30% via-blue-400/50 to-blue-50 to-70% bg-[length:200%] opacity-0"
+            style={{ animationDelay: '700ms' }}
           />
         </div>
         
-        {/* Centered loading text */}
+        {/* Main background gradient overlay */}
+        <div
+          className="absolute inset-0 origin-left animate-loading rounded-lg bg-gradient-to-r from-blue-50/30 from-30% via-blue-300/20 to-blue-50/30 to-70% bg-[length:200%] opacity-0"
+          style={{ animationDelay: '50ms' }}
+        />
+        
+        {/* Centered loading button/text */}
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.div
-            className="text-sm text-gray-600 font-medium bg-white/80 px-4 py-2 rounded-full backdrop-blur-sm"
-            animate={{ opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            className="bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border border-gray-200/50"
+            animate={{ 
+              scale: [1, 1.02, 1],
+              opacity: [0.8, 1, 0.8] 
+            }}
+            transition={{ 
+              duration: 2, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
           >
-            AI enhancing...
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-gray-700">AI enhancing...</span>
+            </div>
           </motion.div>
         </div>
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
