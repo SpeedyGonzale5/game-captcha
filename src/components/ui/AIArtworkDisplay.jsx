@@ -108,14 +108,14 @@ const AIArtworkDisplay = ({
         >
           {/* Background Original Drawing */}
           <div className="relative aspect-square bg-white rounded-2xl shadow-lg border border-gray-200 p-6 overflow-hidden">
-            <div className="w-full h-full bg-gray-50 rounded-lg flex items-center justify-center">
+            <div className="w-full h-full bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
               {originalDrawing && (
                 <Image 
                   src={originalDrawing} 
                   alt="User's original drawing" 
                   width={400} 
                   height={400} 
-                  className="rounded-lg object-contain w-full h-full" 
+                  className="rounded-lg object-contain w-full h-full max-w-full max-h-full" 
                 />
               )}
             </div>
@@ -143,13 +143,13 @@ const AIArtworkDisplay = ({
                     }
                   }}
                 >
-                  <div className="relative w-full h-full bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden group cursor-grab active:cursor-grabbing">
+                  <div className="relative w-full h-full bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden group cursor-grab active:cursor-grabbing flex items-center justify-center">
                     <Image 
                       src={generatedArtwork} 
                       alt={`AI generated artwork for prompt: ${prompt}`} 
                       width={400} 
                       height={400} 
-                      className="rounded-lg object-cover w-full h-full" 
+                      className="rounded-lg object-contain w-full h-full max-w-full max-h-full" 
                     />
                     
                     {/* Swipe hint */}
@@ -197,12 +197,13 @@ const AIArtworkDisplay = ({
 
       {/* AI Info Card */}
       <motion.div
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6"
+        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
       >
-        <div className="flex items-center justify-between">
+        <div className="space-y-6">
+          {/* AI Art Section */}
           <div className="flex items-center gap-3">
             <span className="text-2xl">🎨</span>
             <div>
@@ -210,65 +211,71 @@ const AIArtworkDisplay = ({
               <p className="text-sm text-gray-500">Enhanced your drawing with professional artistic styling</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🎵</span>
-            <div className="flex-1">
-              <p className="font-semibold text-gray-700">ElevenLabs Audio</p>
-              <AnimatePresence mode="wait">
-                {!audioGenerated && !audioUrl ? (
-                  <AudioSkeleton key="audio-skeleton" className="mt-2" />
-                ) : audioUrl && audioUrl !== "#" ? (
-                  <motion.div
-                    key="audio-player"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="mt-2"
-                  >
-                    <audio 
-                      ref={audioRef} 
-                      controls 
-                      className="w-full"
-                      preload="auto"
-                      onLoadedData={() => {
-                        if (audioRef.current) {
-                          audioRef.current.volume = 0.3;
-                          console.log("Audio loaded, volume set to 30%");
-                        }
-                      }}
-                      onCanPlay={() => {
-                        if (audioRef.current) {
-                          audioRef.current.volume = 0.3;
-                        }
-                      }}
-                      onVolumeChange={() => {
-                        if (audioRef.current && audioRef.current.volume !== 0.3) {
-                          console.log("Volume changed to:", audioRef.current.volume);
-                        }
-                      }}
-                    >
-                      <source src={audioUrl} type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="audio-error"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-1"
-                  >
-                    <p className="text-sm text-gray-500">Music generation failed</p>
-                    <button 
-                      onClick={() => window.location.reload()} 
-                      className="text-xs text-blue-500 hover:underline"
-                    >
-                      Try again
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          
+          {/* Audio Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🎵</span>
+              <div>
+                <p className="font-semibold text-gray-700">ElevenLabs Audio</p>
+                <p className="text-sm text-gray-500">AI-generated orchestral music</p>
+              </div>
             </div>
+            
+            <AnimatePresence mode="wait">
+              {!audioGenerated && !audioUrl ? (
+                <AudioSkeleton key="audio-skeleton" />
+              ) : audioUrl && audioUrl !== "#" ? (
+                <motion.div
+                  key="audio-player"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-full"
+                >
+                  <audio 
+                    ref={audioRef} 
+                    controls 
+                    className="w-full min-w-[320px]"
+                    preload="auto"
+                    onLoadedData={() => {
+                      if (audioRef.current) {
+                        audioRef.current.volume = 0.3;
+                        console.log("Audio loaded, volume set to 30%");
+                      }
+                    }}
+                    onCanPlay={() => {
+                      if (audioRef.current) {
+                        audioRef.current.volume = 0.3;
+                      }
+                    }}
+                    onVolumeChange={() => {
+                      if (audioRef.current && audioRef.current.volume !== 0.3) {
+                        console.log("Volume changed to:", audioRef.current.volume);
+                      }
+                    }}
+                  >
+                    <source src={audioUrl} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="audio-error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="p-3 bg-gray-50 rounded-lg"
+                >
+                  <p className="text-sm text-gray-500">Music generation failed</p>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="text-xs text-blue-500 hover:underline mt-1"
+                  >
+                    Try again
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>

@@ -20,6 +20,8 @@ export default function DrawingGame({
 }) {
   const [gameState, setGameState] = useState('prompt'); // prompt, drawing, processing, generated, completed
   const [prompt, setPrompt] = useState('');
+  const [editablePrompt, setEditablePrompt] = useState('');
+  const [isEditingPrompt, setIsEditingPrompt] = useState(false);
   const [brushSize, setBrushSize] = useState(3);
   const [brushColor, setBrushColor] = useState('#000000');
   const [hasDrawing, setHasDrawing] = useState(false);
@@ -43,6 +45,7 @@ export default function DrawingGame({
   useEffect(() => {
     const newPrompt = generateRandomPrompt();
     setPrompt(newPrompt);
+    setEditablePrompt(newPrompt);
     setDrawingAnalytics(prev => ({
       ...prev,
       startTime: Date.now(),
@@ -50,6 +53,50 @@ export default function DrawingGame({
       sessionId: sessionId.current
     }));
   }, []);
+
+  // Handle prompt editing
+  const handlePromptClick = () => {
+    if (gameState === 'prompt' || gameState === 'drawing') {
+      setIsEditingPrompt(true);
+    }
+  };
+
+  const handlePromptChange = (e) => {
+    setEditablePrompt(e.target.value);
+  };
+
+  const handlePromptSubmit = (e) => {
+    if (e.key === 'Enter' || e.type === 'blur') {
+      e.preventDefault();
+      const trimmedPrompt = editablePrompt.trim();
+      if (trimmedPrompt) {
+        // Ensure it starts with "Draw a" if it doesn't already
+        const formattedPrompt = trimmedPrompt.toLowerCase().startsWith('draw a') 
+          ? trimmedPrompt 
+          : `Draw a ${trimmedPrompt}`;
+        
+        setPrompt(formattedPrompt);
+        setEditablePrompt(formattedPrompt);
+        setDrawingAnalytics(prev => ({
+          ...prev,
+          prompt: formattedPrompt,
+          interactions: [...prev.interactions, {
+            type: 'editPrompt',
+            timestamp: Date.now(),
+            value: formattedPrompt
+          }]
+        }));
+      } else {
+        // Reset to current prompt if empty
+        setEditablePrompt(prompt);
+      }
+      setIsEditingPrompt(false);
+    }
+  };
+
+  const handlePromptBlur = (e) => {
+    handlePromptSubmit(e);
+  };
 
   // Handle drawing start
   const handleDrawingStart = useCallback((coordinates) => {
@@ -210,6 +257,8 @@ export default function DrawingGame({
   const handleReset = useCallback(() => {
     const newPrompt = generateRandomPrompt();
     setPrompt(newPrompt);
+    setEditablePrompt(newPrompt);
+    setIsEditingPrompt(false);
     setGameState('prompt');
     setHasDrawing(false);
     setIsProcessing(false);
@@ -256,10 +305,34 @@ export default function DrawingGame({
         </div>
 
         <div className="flex justify-center mb-6 z-10">
-          <div className="inline-flex items-center px-6 py-3 bg-blue-50/90 rounded-full border-2 border-blue-200/70 backdrop-blur-sm shadow-lg">
-            <span className="text-blue-800 text-lg font-semibold tracking-wide">
-              {prompt}
-            </span>
+          <div className="inline-flex items-center px-6 py-3 bg-blue-50/90 rounded-full border-2 border-blue-200/70 backdrop-blur-sm shadow-lg cursor-text hover:bg-blue-100/90 transition-colors">
+            {isEditingPrompt ? (
+              <input
+                type="text"
+                value={editablePrompt}
+                onChange={handlePromptChange}
+                onKeyDown={handlePromptSubmit}
+                onBlur={handlePromptBlur}
+                className="text-blue-800 text-lg font-semibold tracking-wide bg-transparent border-none outline-none min-w-[200px] text-center placeholder-blue-400"
+                placeholder="Draw a..."
+                autoFocus
+                disabled={gameState === 'processing' || gameState === 'generated' || gameState === 'completed'}
+              />
+            ) : (
+              <span 
+                className="text-blue-800 text-lg font-semibold tracking-wide cursor-text select-none"
+                onClick={handlePromptClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handlePromptClick();
+                  }
+                }}
+              >
+                {prompt}
+              </span>
+            )}
           </div>
         </div>
 
