@@ -6,8 +6,8 @@ export const Component = () => {
   return (
       <svg
           xmlns="http://www.w3.org/2000/svg"
-          height="200px"
-          width="200px"
+          height="100px"
+          width="100px"
           viewBox="0 0 200 200"
           className="pencil">
           <defs>

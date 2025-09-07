@@ -144,68 +144,35 @@ export const TextSkeleton = ({ lines = 2, className = "" }) => {
 export const OverlaySkeleton = ({ className = "" }) => {
   return (
     <motion.div
-      className={`absolute inset-0 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center ${className}`}
+      className={`absolute inset-0 bg-white/20 backdrop-blur-sm rounded-lg flex flex-col items-center justify-center gap-4 ${className}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Gemini-style shimmer pattern */}
+      {/* Google Gemini-style loading bars */}
+      <div className="flex flex-col gap-4 w-3/4 max-w-xs">
+        <div
+          className="h-5 w-10/12 origin-left animate-loading rounded-sm bg-gradient-to-r from-pink-100 from-30% via-pink-500/60 to-pink-100 to-70% bg-[length:200%] opacity-0"
+          style={{ animationDelay: '100ms' }}
+        />
+        <div
+          className="h-5 w-full origin-left animate-loading rounded-sm bg-gradient-to-r from-pink-500/60 via-purple-100 via-30% to-pink-500/60 to-60% bg-[length:200%] opacity-0"
+          style={{ animationDelay: '200ms' }}
+        />
+        <div
+          className="h-5 w-3/5 origin-left animate-loading rounded-sm bg-gradient-to-r from-pink-100 from-40% via-pink-500/60 to-pink-100 to-70% bg-[length:200%] opacity-0"
+          style={{ animationDelay: '300ms' }}
+        />
+      </div>
+      
+      {/* Subtle text */}
       <motion.div
-        className="relative w-32 h-32 rounded-lg bg-gradient-to-br from-blue-100/60 via-purple-50/60 to-pink-100/60 overflow-hidden"
-        animate={{
-          scale: [1, 1.02, 1],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
+        className="text-xs text-gray-500 text-center mt-2"
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2, repeat: Infinity }}
       >
-        {/* Multiple shimmer layers for depth */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-          animate={{
-            x: ['-100%', '100%'],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-transparent via-blue-200/20 to-transparent"
-          animate={{
-            x: ['-150%', '150%'],
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5
-          }}
-        />
-        
-        {/* Central loading indicator */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div
-            className="w-4 h-4 border-2 border-gray-400 border-t-blue-500 rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
-        </div>
-        
-        {/* Subtle text */}
-        <div className="absolute bottom-2 left-2 right-2">
-          <motion.div
-            className="text-xs text-gray-500 text-center"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            AI enhancing...
-          </motion.div>
-        </div>
+        AI enhancing...
       </motion.div>
     </motion.div>
   );

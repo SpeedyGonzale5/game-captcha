@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ImageSkeleton, AudioSkeleton, TextSkeleton, OverlaySkeleton } from './SkeletonLoader';
 
 const AIArtworkDisplay = ({
@@ -16,6 +16,17 @@ const AIArtworkDisplay = ({
   className = ""
 }) => {
   const [showEnhanced, setShowEnhanced] = useState(false);
+  const audioRef = useRef(null);
+
+  // Auto-play audio when it becomes available
+  useEffect(() => {
+    if (audioGenerated && audioUrl && audioUrl !== "#" && audioRef.current) {
+      audioRef.current.volume = 0.3; // Set volume to 30%
+      audioRef.current.play().catch(error => {
+        console.log("Auto-play failed:", error);
+      });
+    }
+  }, [audioGenerated, audioUrl]);
 
   return (
     <div className={`w-full ${className}`}>
@@ -72,12 +83,13 @@ const AIArtworkDisplay = ({
             <AnimatePresence>
               {!imageGenerated ? (
                 <OverlaySkeleton key="overlay-skeleton" />
-              ) : generatedArtwork && (
+              ) : generatedArtwork && showEnhanced && (
                 <motion.div
                   key="enhanced-overlay"
                   className="absolute inset-0 p-6"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.7, type: "spring" }}
                   drag="x"
                   dragConstraints={{ left: -100, right: 100 }}
@@ -88,9 +100,6 @@ const AIArtworkDisplay = ({
                     } else if (info.offset.x < -50) {
                       setShowEnhanced(true);
                     }
-                  }}
-                  style={{
-                    x: showEnhanced ? 0 : 0,
                   }}
                 >
                   <div className="relative w-full h-full bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden group cursor-grab active:cursor-grabbing">
@@ -175,7 +184,7 @@ const AIArtworkDisplay = ({
                     transition={{ duration: 0.5 }}
                     className="mt-2"
                   >
-                    <audio controls className="w-full">
+                    <audio ref={audioRef} controls className="w-full">
                       <source src={audioUrl} type="audio/mpeg" />
                       Your browser does not support the audio element.
                     </audio>
